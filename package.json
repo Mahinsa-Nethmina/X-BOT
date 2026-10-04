@@ -1,0 +1,23 @@
+{
+  "name": "hydra-bot",
+  "version": "1.0.0",
+  "description": "HYDRA BOT — WhatsApp bot by HYDRA, powered by @innovatorssoft/baileys",
+  "author": "HYDRA",
+  "license": "MIT",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node index.js"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "dependencies": {
+    "@hapi/boom": "^9.1.4",
+    "@innovatorssoft/baileys": "^7.4.7",
+    "dotenv": "^16.4.7",
+    "jimp": "^0.22.12",
+    "pino": "^9.6.0",
+    "sharp": "^0.35.4"
+  }
+}
