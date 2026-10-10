@@ -81,16 +81,6 @@ async function autoporn(ctx, args, argText) {
           footer: config.footer,
           interactiveButtons: [
             {
-              name: "open_webview",
-              buttonParamsJson: JSON.stringify({
-                title: "Watch Online",
-                link: {
-                  in_app_webview: true, // or false
-                  url: item.url,
-                },
-              }),
-            },
-            {
               name: "cta_copy",
               buttonParamsJson: JSON.stringify({
                 display_text: "Copy Link",
