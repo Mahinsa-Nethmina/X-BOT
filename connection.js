@@ -9,7 +9,6 @@ const makeWASocket = baileys.default || baileys.makeWASocket || baileys
 const {
   useMultiFileAuthState,
   DisconnectReason,
-  Browsers,
   fetchLatestBaileysVersion,
   makeCacheableSignalKeyStore
 } = baileys
@@ -107,14 +106,15 @@ function permanentAuthFailure(status) {
 }
 
 async function handlePairing(sock) {
-  if (sock.authState?.creds?.registered) return
-  const number = await askPhoneNumber()
-  logger('info', 'Requesting pairing code...')
-  await sleep(1500)
-  const code = await sock.requestPairingCode(number)
-  const formatted = String(code || '').replace(/(.{4})/g, '$1-').replace(/-$/, '')
-  logger('info', `Pairing code: ${formatted}`)
-  logger('info', 'On your phone: WhatsApp > Linked Devices > Link with phone number')
+  if (sock.authState?.creds?.registered) return;
+  const number = await askPhoneNumber();
+  logger("info", "Waiting for WhatsApp connection...");
+  await sleep(5000);
+  if (sock.authState?.creds?.registered) return;
+  logger("info", "Requesting pairing code...");
+  const code = await sock.requestPairingCode(number, 'XBOT1234');
+  logger("info", `Pairing code: ${code}`);
+  logger("info", "Open WhatsApp > Linked Devices > Link with phone number");
 }
 
 function bindSocketEvents(sock, saveCreds) {
@@ -175,6 +175,9 @@ async function onConnectionUpdate(sock, update) {
       ? error.output?.statusCode
       : error?.output?.statusCode
     const loggedOut = permanentAuthFailure(status)
+    if (status === 515) {
+      logger("info", "WhatsApp requested a connection restart");
+    }
 
     logger('warn', 'Connection closed', {
       status: status || 'unknown',
@@ -228,9 +231,7 @@ async function openSocket() {
     ? makeCacheableSignalKeyStore(state.keys, baileysLogger)
     : state.keys
 
-  const browser = typeof Browsers?.ubuntu === 'function'
-    ? Browsers.ubuntu(config.botName)
-    : ['Ubuntu', 'Chrome', '22.04.4']
+  
 
   const sock = makeWASocket({
     version,
@@ -240,8 +241,7 @@ async function openSocket() {
     },
     logger: baileysLogger,
     printQRInTerminal: false,
-    browser,
-    markOnlineOnConnect: false,
+    markOnlineOnConnect: true,
     syncFullHistory: false,
     generateHighQualityLinkPreview: false,
     cachedGroupMetadata: async (jid) => getCachedGroupMetadata(jid),
